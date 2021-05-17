@@ -1,11 +1,14 @@
 import 'dart:ui';
 
+import 'package:chat_app_flutter/helpers/mostrar_alerta.dart';
+import 'package:chat_app_flutter/services/auth_service.dart';
 import 'package:chat_app_flutter/widgets/btn_azul.dart';
 import 'package:chat_app_flutter/widgets/custom_input.dart';
 import 'package:chat_app_flutter/widgets/labels.dart';
 import 'package:chat_app_flutter/widgets/logo_login.dart';
 import 'package:chat_app_flutter/widgets/terminosycondiciones.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -48,11 +51,12 @@ class _Form extends StatefulWidget {
 
 class __FormState extends State<_Form> {
   final emailCtrl = TextEditingController();
-  final NombreCtrl = TextEditingController();
+  final nombreCtrl = TextEditingController();
   final passCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final authSr = Provider.of<AUthService>(context);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: Column(
@@ -61,7 +65,7 @@ class __FormState extends State<_Form> {
             hint: 'Nombre',
             iconleft: Icon(Icons.perm_identity),
             keyboardType: TextInputType.text,
-            textController: NombreCtrl,
+            textController: nombreCtrl,
           ),
           CustomInput(
             hint: 'Correo',
@@ -77,10 +81,20 @@ class __FormState extends State<_Form> {
           ),
           SizedBox(height: 20),
           BotonAzul(
-              function: () {
-                print(emailCtrl.text);
-              },
-              texto: 'Ingresar'),
+            texto: 'Crear cuenta',
+            onPressed: authSr.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final registerOk = await authSr.register(
+                        nombreCtrl.text, emailCtrl.text, passCtrl.text);
+                    if (registerOk == true) {
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      mostrarAlerta(context, 'Datos Incorrectos', registerOk);
+                    }
+                  },
+          ),
         ],
       ),
     );

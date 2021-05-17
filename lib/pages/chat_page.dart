@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:chat_app_flutter/widgets/chat_message.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:chat_app_flutter/widgets/chat_message.dart';
 
 class ChatPage extends StatefulWidget {
   @override

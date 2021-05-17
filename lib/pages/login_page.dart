@@ -1,17 +1,19 @@
 import 'dart:ui';
 
+import 'package:chat_app_flutter/helpers/mostrar_alerta.dart';
+import 'package:chat_app_flutter/services/auth_service.dart';
 import 'package:chat_app_flutter/widgets/btn_azul.dart';
 import 'package:chat_app_flutter/widgets/custom_input.dart';
 import 'package:chat_app_flutter/widgets/labels.dart';
 import 'package:chat_app_flutter/widgets/logo_login.dart';
 import 'package:chat_app_flutter/widgets/terminosycondiciones.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sS = MediaQuery.of(context);
-    print('${sS.size.width} a ${sS.size.height} ');
     return Scaffold(
         backgroundColor: Color(0xffF2F2F2),
         body: SingleChildScrollView(
@@ -54,6 +56,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authSr = Provider.of<AUthService>(context);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: Column(
@@ -72,10 +76,21 @@ class __FormState extends State<_Form> {
           ),
           SizedBox(height: 20),
           BotonAzul(
-              function: () {
-                print(emailCtrl.text);
-              },
-              texto: 'Ingresar'),
+            texto: 'Ingresar',
+            onPressed: authSr.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final loginOk = await authSr.login(
+                        emailCtrl.text.trim(), passCtrl.text.trim());
+                    if (loginOk) {
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      mostrarAlerta(context, 'Login Incorrecto',
+                          'Revise las credenciales nuevamente');
+                    }
+                  },
+          ),
         ],
       ),
     );

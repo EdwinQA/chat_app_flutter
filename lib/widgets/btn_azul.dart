@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class BotonAzul extends StatelessWidget {
-  final void Function()? function;
+  final void Function()? onPressed;
   final String texto;
 
   const BotonAzul({
-    required this.function,
+    required this.onPressed,
     required this.texto,
   });
 
@@ -16,7 +16,7 @@ class BotonAzul extends StatelessWidget {
       highlightElevation: 5,
       color: Colors.blue,
       shape: StadiumBorder(),
-      onPressed: function,
+      onPressed: onPressed,
       child: Container(
         width: double.infinity,
         height: 55,
