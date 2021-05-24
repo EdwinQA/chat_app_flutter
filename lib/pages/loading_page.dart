@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chat_app_flutter/pages/login_page.dart';
 import 'package:chat_app_flutter/pages/usuarios_page.dart';
 import 'package:chat_app_flutter/services/auth_service.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:chat_app_flutter/services/socket_services.dart';
 
 class LoadingPage extends StatelessWidget {
   @override
@@ -10,7 +11,7 @@ class LoadingPage extends StatelessWidget {
     return Scaffold(
       body: FutureBuilder(
         future: checkLoginState(context),
-        builder: (context, snapshot) {
+        builder: (_, snapshot) {
           return Center(
             child: Text('Espere porfavor...'),
           );
@@ -20,11 +21,13 @@ class LoadingPage extends StatelessWidget {
   }
 
   Future checkLoginState(BuildContext context) async {
-    final authSr = Provider.of<AUthService>(context, listen: false);
-    final autenticado = await authSr.isLoggedIn();
+    final authSrv = Provider.of<AUthService>(context, listen: false);
+    final socketSrv = Provider.of<SocketService>(context, listen: false);
+    final autenticado = await authSrv.isLoggedIn();
 
     if (autenticado) {
       //Navigator.pushReplacementNamed(context, 'usuarios');
+      socketSrv.connect();
       Navigator.pushReplacement(
           context,
           PageRouteBuilder(

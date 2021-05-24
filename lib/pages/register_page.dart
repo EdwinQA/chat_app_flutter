@@ -1,14 +1,15 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:chat_app_flutter/helpers/mostrar_alerta.dart';
 import 'package:chat_app_flutter/services/auth_service.dart';
+import 'package:chat_app_flutter/services/socket_services.dart';
 import 'package:chat_app_flutter/widgets/btn_azul.dart';
 import 'package:chat_app_flutter/widgets/custom_input.dart';
 import 'package:chat_app_flutter/widgets/labels.dart';
 import 'package:chat_app_flutter/widgets/logo_login.dart';
 import 'package:chat_app_flutter/widgets/terminosycondiciones.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -57,6 +58,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authSr = Provider.of<AUthService>(context);
+    final socketServices = Provider.of<SocketService>(context);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: Column(
@@ -89,6 +91,7 @@ class __FormState extends State<_Form> {
                     final registerOk = await authSr.register(
                         nombreCtrl.text, emailCtrl.text, passCtrl.text);
                     if (registerOk == true) {
+                      socketServices.connect();
                       Navigator.pushReplacementNamed(context, 'usuarios');
                     } else {
                       mostrarAlerta(context, 'Datos Incorrectos', registerOk);

@@ -5,33 +5,22 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:chat_app_flutter/global/environment.dart';
+
 import 'package:chat_app_flutter/models/login_response.dart';
 import 'package:chat_app_flutter/models/usuario.dart';
 
 class AUthService with ChangeNotifier {
   late Usuario _usuario;
   bool _autenticando = false;
-  int _autenticado = 0;
+
   final _storage = new FlutterSecureStorage();
 
   Usuario get usuario => this._usuario;
-
-  // set usuario(Usuario valor) {
-  //   this._usuario = valor;
-  //   notifyListeners();
-  // }
 
   bool get autenticando => this._autenticando;
 
   set autenticando(bool valor) {
     this._autenticando = valor;
-    notifyListeners();
-  }
-
-  int get autenticado => this._autenticado;
-
-  set autenticado(int valor) {
-    this._autenticado = valor;
     notifyListeners();
   }
 
@@ -63,10 +52,10 @@ class AUthService with ChangeNotifier {
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
       this._usuario = loginResponse.usuario;
+
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
-      _logout();
       return false;
     }
   }
@@ -91,30 +80,31 @@ class AUthService with ChangeNotifier {
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
-      _logout();
       final respBody = jsonDecode(resp.body);
       return respBody['msg'];
     }
   }
 
   Future<bool> isLoggedIn() async {
-    this._autenticado = 0;
     final token = await this._storage.read(key: 'token');
 
     final uri = Uri.parse('${Environment.apiUrl}/login/renew');
 
     final resp = await http.get(
       uri,
-      headers: {'x-token': '$token', 'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-token': '$token',
+      },
     );
-    print(resp.body);
+
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
       this._usuario = loginResponse.usuario;
       await this._guardarToken(loginResponse.token);
       return true;
     } else {
-      this._logout();
+      this.logout();
       return false;
     }
   }
@@ -123,7 +113,7 @@ class AUthService with ChangeNotifier {
     return await _storage.write(key: 'token', value: token);
   }
 
-  Future _logout() async {
+  Future logout() async {
     return await _storage.delete(key: 'token');
   }
 }
